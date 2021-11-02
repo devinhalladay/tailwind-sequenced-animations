@@ -1,5 +1,5 @@
 {
-  "name": "@devinhalladay/tailwind-animation-sequence",
+  "name": "@devinhalladay/tailwind-sequenced-animations",
   "version": "1.0.0",
   "description": "A Tailwind plugin which generates utilities to create staggered animations on lists of content.",
   "main": "index.js",
@@ -34,6 +34,7 @@
   "author": "Devin Halladay <devin@devinhalladay.com> (https://github.com/devinhalladay)",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@babel/preset-es2017": "^7.0.0-beta.53",
     "eslint": "^7.2.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^6.15.0",
@@ -49,5 +50,8 @@
     "prettier": "^2.2.0",
     "standard-version": "^9.1.0",
     "tailwindcss": "^2.0.1"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.16.0"
   }
 }

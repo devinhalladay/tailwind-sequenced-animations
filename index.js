@@ -2,42 +2,62 @@ const plugin = require('tailwindcss/plugin');
 
 module.exports = plugin(
   function ({ addUtilities, theme, variants }) {
-    // If your plugin requires user config,
-    // you can access these options here.
-    // Docs: https://tailwindcss.com/docs/plugins#exposing-options
-    const options = theme('animationSequences');
+    // Retrieve some values from user's Tailwind config.
+    const options = theme('sequencedAnimations.options', {});
+    const sequence = theme('sequencedAnimations.sequence', []);
+    const keyframes = theme('keyframes', {});
 
-    // Add CSS-in-JS syntax to create utility classes.
-    // Docs: https://tailwindcss.com/docs/plugins#adding-utilities
-    const utilities = {
-      '.example-utility-class': {
-        display: 'block',
+    // Generate our utilities by iterating over our theme's keyframes,
+    // then again over our sequence length.
+    const utilities = Object.keys(keyframes).reduce(
+      (allUtilities, currentValue) => {
+        const classes = sequence.reduce((allClasses, delay, index) => {
+          return {
+            ...allClasses,
+            [`.animate-sequence-${currentValue}-${index + 1}`]: {
+              'animation-name': currentValue,
+              'animation-fill-mode': options.fillMode || '',
+              'animation-delay': delay,
+              'animation-timing-function': options.easing,
+              'animation-duration': options.duration || '',
+            },
+          };
+        }, {});
+
+        return {
+          ...allUtilities,
+          ...classes,
+        };
       },
-    };
+      {}
+    );
 
-    // Conditionally add utility class based on user configuration.
-    if (options.YOUR_PLUGIN_CUSTOM_OPTION) {
-      utilities['.custom-utility-class'] = {
-        'background-color': 'red',
-      };
-    }
-
+    // Register the utilities with Tailwind.
     addUtilities(utilities, {
-      variants: variants('animationSequences'),
+      variants: variants('sequencedAnimations'),
     });
   },
   {
     theme: {
-      // Default options for your custom plugin.
-      // Docs: https://tailwindcss.com/docs/plugins#exposing-options
-      animationSequences: {
-        YOUR_PLUGIN_CUSTOM_OPTION: false,
+      sequencedAnimations: {
+        /**
+         * @returns [0s, 0.05s, 0.1s, 0.15s, 0.2s, 0.25s, ...]
+         * An array of durations after which an animation will be triggered.
+         * To increase the number of durations generated, you can simply increase the
+         * number given to the Array() call.
+         */
+        sequence: Array(6)
+          .fill()
+          .map((_, i) => `${i * 0.05}s`),
+        options: {
+          duration: '0.3s',
+          easing: 'ease-in-out',
+          fillMode: 'both',
+        },
       },
-    },
-    variants: {
-      // Default variants for your custom plugin.
-      // Docs: https://tailwindcss.com/docs/plugins#variants
-      animationSequences: ['responsive'],
+      variants: {
+        animationSequences: ['responsive'],
+      },
     },
   }
 );
